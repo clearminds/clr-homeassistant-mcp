@@ -35,8 +35,8 @@ class Settings(BaseSettings):
         """Load HA instances from env vars or credentials.json.
 
         Priority order:
-        1. Environment variables (HA_URL, HA_TOKEN) - checked FIRST
-        2. ~/.config/homeassistant/credentials.json - fallback
+        1. ~/.config/homeassistant/credentials.json - checked FIRST
+        2. Environment variables (HA_URL, HA_TOKEN) - override
 
         Supports two formats in credentials.json:
 
@@ -54,28 +54,24 @@ class Settings(BaseSettings):
         """
         instances: dict[str, HAInstance] = {}
 
-        # 1. FIRST: Check environment variables
+        # 1. FIRST: Load from environment variables (base/fallback)
         if self.ha_url and self.ha_token:
-            logger.info("Using Home Assistant credentials from environment variables")
             instances["default"] = HAInstance("default", self.ha_url, self.ha_token)
-            return instances
 
-        # 2. FALLBACK: Check credentials.json file
+        # 2. THEN: Override with credentials.json file (takes priority)
         if CREDS_PATH.exists():
             try:
                 data: dict[str, Any] = json.loads(CREDS_PATH.read_text())
 
                 if "instances" in data:
+                    instances.clear()
                     for name, cfg in data["instances"].items():
                         instances[name] = HAInstance(name, cfg["url"], cfg["token"])
                     logger.info(f"Loaded {len(instances)} Home Assistant instance(s) from {CREDS_PATH}")
-                    return instances
-
-                # Legacy single-instance format
-                if data.get("url") and data.get("token"):
+                elif data.get("url") and data.get("token"):
+                    # Legacy single-instance format
                     instances["default"] = HAInstance("default", data["url"], data["token"])
                     logger.info(f"Loaded Home Assistant credentials from {CREDS_PATH}")
-                    return instances
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Failed to load {CREDS_PATH}: {e}")
 
