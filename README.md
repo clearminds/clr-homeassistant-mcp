@@ -1,13 +1,13 @@
-# homeassistant-mcp-server
+# clr-homeassistant-mcp
 
 Home Assistant smart home control
 
 ## Install
 
 ```bash
-pip install homeassistant-mcp-server
+pip install clr-homeassistant-mcp
 # or
-uvx homeassistant-mcp-server
+uvx clr-homeassistant-mcp
 ```
 
 ## Configuration
@@ -51,16 +51,16 @@ Get token: Settings → Long-Lived Access Tokens in Home Assistant UI
 See `--help` for additional options:
 
 ```bash
-homeassistant-mcp-server --help
+clr-homeassistant-mcp --help
 ```
 
 ## Development
 
 ```bash
-git clone https://github.com/clearminds/homeassistant-mcp-server.git
-cd homeassistant-mcp-server
+git clone https://github.com/clearminds/clr-homeassistant-mcp.git
+cd clr-homeassistant-mcp
 uv sync
-uv run homeassistant-mcp-server
+uv run clr-homeassistant-mcp
 ```
 
 ## License

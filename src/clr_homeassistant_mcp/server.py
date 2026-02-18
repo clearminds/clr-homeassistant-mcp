@@ -8,8 +8,8 @@ from typing import Any
 
 from fastmcp import FastMCP
 
-from homeassistant_mcp_server.config import HAInstance, Settings
-from homeassistant_mcp_server.ha_client import HAClient
+from clr_homeassistant_mcp.config import HAInstance, Settings
+from clr_homeassistant_mcp.ha_client import HAClient
 
 mcp = FastMCP("HomeAssistant")
 _clients: dict[str, HAClient] = {}

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "homeassistant-mcp-server"
+name = "clr-homeassistant-mcp"
 version = "1.0.0"
 description = "MCP server for Home Assistant smart home control"
 requires-python = ">=3.11"
@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/clearminds/homeassistant-mcp-server"
+Repository = "https://github.com/clearminds/clr-homeassistant-mcp"
 
 [project.scripts]
-homeassistant-mcp-server = "homeassistant_mcp_server.server:main"
+clr-homeassistant-mcp = "clr_homeassistant_mcp.server:main"
