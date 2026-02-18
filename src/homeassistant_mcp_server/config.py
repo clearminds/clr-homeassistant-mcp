@@ -32,7 +32,11 @@ class Settings(BaseSettings):
     ha_token: str = ""
 
     def load_instances(self) -> dict[str, HAInstance]:
-        """Load HA instances from credentials.json or env vars.
+        """Load HA instances from env vars or credentials.json.
+
+        Priority order:
+        1. Environment variables (HA_URL, HA_TOKEN) - checked FIRST
+        2. ~/.config/homeassistant/credentials.json - fallback
 
         Supports two formats in credentials.json:
 
@@ -50,22 +54,36 @@ class Settings(BaseSettings):
         """
         instances: dict[str, HAInstance] = {}
 
-        if CREDS_PATH.exists():
-            data: dict[str, Any] = json.loads(CREDS_PATH.read_text())
-
-            if "instances" in data:
-                for name, cfg in data["instances"].items():
-                    instances[name] = HAInstance(name, cfg["url"], cfg["token"])
-                return instances
-
-            # Legacy single-instance format
-            if data.get("url") and data.get("token"):
-                instances["default"] = HAInstance("default", data["url"], data["token"])
-                return instances
-
-        # Fallback to env vars
+        # 1. FIRST: Check environment variables
         if self.ha_url and self.ha_token:
+            logger.info("Using Home Assistant credentials from environment variables")
             instances["default"] = HAInstance("default", self.ha_url, self.ha_token)
+            return instances
+
+        # 2. FALLBACK: Check credentials.json file
+        if CREDS_PATH.exists():
+            try:
+                data: dict[str, Any] = json.loads(CREDS_PATH.read_text())
+
+                if "instances" in data:
+                    for name, cfg in data["instances"].items():
+                        instances[name] = HAInstance(name, cfg["url"], cfg["token"])
+                    logger.info(f"Loaded {len(instances)} Home Assistant instance(s) from {CREDS_PATH}")
+                    return instances
+
+                # Legacy single-instance format
+                if data.get("url") and data.get("token"):
+                    instances["default"] = HAInstance("default", data["url"], data["token"])
+                    logger.info(f"Loaded Home Assistant credentials from {CREDS_PATH}")
+                    return instances
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.warning(f"Failed to load {CREDS_PATH}: {e}")
+
+        if not instances:
+            logger.warning(
+                "No Home Assistant instances configured. Set HA_URL/HA_TOKEN env vars "
+                f"or create {CREDS_PATH}"
+            )
 
         return instances
 
