@@ -9,7 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class HAClient:
-    """Home Assistant REST API client with Bearer token auth."""
+    """Home Assistant REST API client with Bearer token auth.
+
+    Attributes:
+        base_url: Base URL of the Home Assistant server (trailing slash stripped).
+    """
 
     def __init__(self, base_url: str, token: str) -> None:
         self.base_url = base_url.rstrip("/")
@@ -23,16 +27,38 @@ class HAClient:
         )
 
     def close(self) -> None:
+        """Close the underlying HTTP client and release resources."""
         self._http.close()
 
     def get(self, path: str) -> Any:
-        """GET request. Returns parsed JSON."""
+        """Send a GET request and return the parsed JSON response.
+
+        Args:
+            path: API path relative to ``/api`` (e.g. ``"/states"``).
+
+        Returns:
+            Parsed JSON response body.
+
+        Raises:
+            httpx.HTTPStatusError: If the server returns a non-2xx status code.
+        """
         resp = self._http.get(path)
         resp.raise_for_status()
         return resp.json()
 
     def post(self, path: str, data: Any = None) -> Any:
-        """POST request. Returns parsed JSON."""
+        """Send a POST request and return the parsed JSON response.
+
+        Args:
+            path: API path relative to ``/api`` (e.g. ``"/services/light/turn_on"``).
+            data: JSON-serializable payload to include in the request body.
+
+        Returns:
+            Parsed JSON response body.
+
+        Raises:
+            httpx.HTTPStatusError: If the server returns a non-2xx status code.
+        """
         resp = self._http.post(path, json=data or {})
         resp.raise_for_status()
         return resp.json()

@@ -18,7 +18,18 @@ _default_instance: str = "default"
 
 
 def _get_client(instance: str | None = None) -> HAClient:
-    """Get client for the given instance, or the default."""
+    """Get the HAClient for the given instance, or the default.
+
+    Args:
+        instance: Instance name to look up.  Uses the default instance
+            when ``None``.
+
+    Returns:
+        The HAClient associated with the requested instance.
+
+    Raises:
+        ValueError: If the requested instance name is not configured.
+    """
     name = instance or _default_instance
     if name not in _clients:
         available = ", ".join(_clients.keys()) or "(none)"

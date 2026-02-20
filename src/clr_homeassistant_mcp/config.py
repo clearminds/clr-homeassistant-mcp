@@ -13,7 +13,13 @@ CREDS_PATH = Path.home() / ".config" / "homeassistant" / "credentials.json"
 
 
 class HAInstance:
-    """A single Home Assistant instance."""
+    """A single Home Assistant instance.
+
+    Attributes:
+        name: Identifier for this instance (e.g. "home", "office").
+        url: Base URL of the Home Assistant server (trailing slash stripped).
+        token: Long-lived access token for authentication.
+    """
 
     def __init__(self, name: str, url: str, token: str) -> None:
         self.name = name
@@ -22,7 +28,14 @@ class HAInstance:
 
 
 class Settings(BaseSettings):
-    """Settings loaded from environment variables."""
+    """Settings loaded from environment variables.
+
+    Attributes:
+        ha_transport: MCP transport mode ("stdio" or "http").
+        ha_log_level: Logging level name (e.g. "INFO", "DEBUG").
+        ha_url: Home Assistant URL for single-instance configuration.
+        ha_token: Long-lived access token for single-instance configuration.
+    """
 
     ha_transport: str = "stdio"
     ha_log_level: str = "INFO"
@@ -51,6 +64,10 @@ class Settings(BaseSettings):
                 },
                 "default": "home"
             }
+
+        Returns:
+            A mapping of instance names to HAInstance objects.  Returns an
+            empty dict if no instances are configured.
         """
         instances: dict[str, HAInstance] = {}
 
@@ -84,7 +101,13 @@ class Settings(BaseSettings):
         return instances
 
     def get_default_name(self) -> str:
-        """Get the default instance name from credentials.json."""
+        """Get the default instance name from credentials.json.
+
+        Returns:
+            The default instance name.  Falls back to the first instance key
+            if no explicit default is set, or ``"default"`` if no credentials
+            file exists.
+        """
         if CREDS_PATH.exists():
             data: dict[str, Any] = json.loads(CREDS_PATH.read_text())
             if "default" in data:
