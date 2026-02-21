@@ -39,6 +39,7 @@ class Settings(BaseSettings):
 
     ha_transport: str = "stdio"
     ha_log_level: str = "INFO"
+    ha_read_only: bool = False
 
     # Single-instance env vars (used if credentials.json has no "instances" key)
     ha_url: str = ""

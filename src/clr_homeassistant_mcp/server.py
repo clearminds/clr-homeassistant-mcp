@@ -16,6 +16,8 @@ _clients: dict[str, HAClient] = {}
 _instances: dict[str, HAInstance] = {}
 _default_instance: str = "default"
 
+WRITE_TOOLS = ["ha_turn_on", "ha_turn_off", "ha_toggle", "ha_trigger_scene", "ha_call_service"]
+
 
 def _get_client(instance: str | None = None) -> HAClient:
     """Get the HAClient for the given instance, or the default.
@@ -264,6 +266,12 @@ def main() -> None:
         default=None,
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
     )
+    parser.add_argument(
+        "--read-only",
+        action="store_true",
+        default=None,
+        help="Run in read-only mode (hide write tools)",
+    )
     args = parser.parse_args()
 
     transport = args.transport or settings.ha_transport
@@ -306,6 +314,12 @@ def main() -> None:
 
     logger.info("Default instance: %s", _default_instance)
     logger.info("Starting Home Assistant MCP Server")
+
+    read_only = args.read_only if args.read_only is not None else settings.ha_read_only
+    if read_only and WRITE_TOOLS:
+        for name in WRITE_TOOLS:
+            mcp.remove_tool(name)
+        logger.info("Read-only mode: %d write tools removed", len(WRITE_TOOLS))
 
     try:
         if transport == "stdio":
