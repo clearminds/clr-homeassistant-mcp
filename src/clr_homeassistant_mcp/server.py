@@ -10,8 +10,10 @@ from fastmcp import FastMCP
 
 from clr_homeassistant_mcp.config import HAInstance, Settings
 from clr_homeassistant_mcp.ha_client import HAClient
+from clr_homeassistant_mcp.middleware import ToolValidationMiddleware
 
 mcp = FastMCP("HomeAssistant")
+mcp.add_middleware(ToolValidationMiddleware())
 _clients: dict[str, HAClient] = {}
 _instances: dict[str, HAInstance] = {}
 _default_instance: str = "default"
