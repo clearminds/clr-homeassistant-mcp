@@ -46,6 +46,14 @@ Multi-instance:
 | `HA_URL` | Home Assistant URL | `https://homeassistant.local:8123` |
 | `HA_TOKEN` | Long-lived access token | `your-token` |
 
+Optional:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `HA_READ_ONLY` | Run in read-only mode | `false` |
+| `HA_TRANSPORT` | Transport protocol (`stdio` or `http`) | `stdio` |
+| `HA_LOG_LEVEL` | Log level | `INFO` |
+
 Get token: Settings → Long-Lived Access Tokens in Home Assistant UI
 
 See `--help` for additional options:
