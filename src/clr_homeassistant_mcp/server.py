@@ -250,27 +250,6 @@ def ha_call_service(
     return f"Called {domain}.{service}"
 
 
-# ── Composite init ───────────────────────────────────────────────────
-
-
-def init_composite() -> FastMCP:
-    """Initialize for composite mounting. Returns the FastMCP instance."""
-    global _clients, _instances, _default_instance
-
-    settings = Settings()
-    _instances = settings.load_instances()
-    _default_instance = settings.get_default_name()
-
-    for name, inst in _instances.items():
-        _clients[name] = HAClient(inst.url, inst.token)
-
-    if settings.ha_read_only and WRITE_TOOLS:
-        for name in WRITE_TOOLS:
-            mcp.remove_tool(name)
-
-    return mcp
-
-
 # ── Main entry point ─────────────────────────────────────────────────
 
 
