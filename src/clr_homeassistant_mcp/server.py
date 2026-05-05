@@ -18,7 +18,10 @@ _clients: dict[str, HAClient] = {}
 _instances: dict[str, HAInstance] = {}
 _default_instance: str = "default"
 
-WRITE_TOOLS = ["ha_turn_on", "ha_turn_off", "ha_toggle", "ha_trigger_scene", "ha_call_service"]
+# Imported here (not at the top) on purpose: annotations.py needs ``mcp`` from
+# this module, so importing it before the ``mcp = FastMCP(...)`` line above
+# would be a circular import. Do not move.
+from clr_homeassistant_mcp.annotations import read_tool, remove_non_read_tools, write_tool  # noqa: E402
 
 
 def _get_client(instance: str | None = None) -> HAClient:
@@ -44,7 +47,7 @@ def _get_client(instance: str | None = None) -> HAClient:
 # ── Info tools ───────────────────────────────────────────────────────
 
 
-@mcp.tool
+@read_tool
 def ha_instances() -> list[dict[str, str]]:
     """List all configured Home Assistant instances.
 
@@ -60,7 +63,7 @@ def ha_instances() -> list[dict[str, str]]:
     ]
 
 
-@mcp.tool
+@read_tool
 def ha_status(instance: str | None = None) -> dict[str, Any]:
     """Get Home Assistant server status and version.
 
@@ -84,7 +87,7 @@ def ha_status(instance: str | None = None) -> dict[str, Any]:
 # ── Entity tools ─────────────────────────────────────────────────────
 
 
-@mcp.tool
+@read_tool
 def ha_list_entities(
     domain: str | None = None,
     instance: str | None = None,
@@ -116,7 +119,7 @@ def ha_list_entities(
     return results
 
 
-@mcp.tool
+@read_tool
 def ha_get_state(
     entity_id: str,
     instance: str | None = None,
@@ -143,7 +146,7 @@ def ha_get_state(
 # ── Service tools ────────────────────────────────────────────────────
 
 
-@mcp.tool
+@write_tool
 def ha_turn_on(
     entity_id: str,
     brightness_pct: int | None = None,
@@ -167,7 +170,7 @@ def ha_turn_on(
     return f"Turned on {entity_id}"
 
 
-@mcp.tool
+@write_tool
 def ha_turn_off(
     entity_id: str,
     instance: str | None = None,
@@ -186,7 +189,7 @@ def ha_turn_off(
     return f"Turned off {entity_id}"
 
 
-@mcp.tool
+@write_tool
 def ha_toggle(
     entity_id: str,
     instance: str | None = None,
@@ -205,7 +208,7 @@ def ha_toggle(
     return f"Toggled {entity_id}"
 
 
-@mcp.tool
+@write_tool
 def ha_trigger_scene(
     entity_id: str,
     instance: str | None = None,
@@ -223,7 +226,7 @@ def ha_trigger_scene(
     return f"Activated scene {entity_id}"
 
 
-@mcp.tool
+@write_tool
 def ha_call_service(
     domain: str,
     service: str,
@@ -339,10 +342,9 @@ def main() -> None:
     logger.info("Starting Home Assistant MCP Server")
 
     read_only = args.read_only if args.read_only is not None else settings.ha_read_only
-    if read_only and WRITE_TOOLS:
-        for name in WRITE_TOOLS:
-            mcp.remove_tool(name)
-        logger.info("Read-only mode: %d write tools removed", len(WRITE_TOOLS))
+    if read_only:
+        removed = remove_non_read_tools(mcp)
+        logger.info("Read-only mode: %d non-read tools removed", removed)
 
     try:
         if transport == "stdio":
