@@ -48,7 +48,7 @@ def _get_client(instance: str | None = None) -> HAClient:
 
 
 @read_tool
-def ha_instances() -> list[dict[str, str]]:
+def instances() -> list[dict[str, str]]:
     """List all configured Home Assistant instances.
 
     Returns instance names with their URLs and which is the default.
@@ -64,7 +64,7 @@ def ha_instances() -> list[dict[str, str]]:
 
 
 @read_tool
-def ha_status(instance: str | None = None) -> dict[str, Any]:
+def status(instance: str | None = None) -> dict[str, Any]:
     """Get Home Assistant server status and version.
 
     Args:
@@ -88,7 +88,7 @@ def ha_status(instance: str | None = None) -> dict[str, Any]:
 
 
 @read_tool
-def ha_list_entities(
+def list_entities(
     domain: str | None = None,
     instance: str | None = None,
 ) -> list[dict[str, Any]]:
@@ -120,7 +120,7 @@ def ha_list_entities(
 
 
 @read_tool
-def ha_get_state(
+def get_state(
     entity_id: str,
     instance: str | None = None,
 ) -> dict[str, Any]:
@@ -147,7 +147,7 @@ def ha_get_state(
 
 
 @write_tool
-def ha_turn_on(
+def turn_on(
     entity_id: str,
     brightness_pct: int | None = None,
     instance: str | None = None,
@@ -171,7 +171,7 @@ def ha_turn_on(
 
 
 @write_tool
-def ha_turn_off(
+def turn_off(
     entity_id: str,
     instance: str | None = None,
 ) -> str:
@@ -190,7 +190,7 @@ def ha_turn_off(
 
 
 @write_tool
-def ha_toggle(
+def toggle(
     entity_id: str,
     instance: str | None = None,
 ) -> str:
@@ -209,7 +209,7 @@ def ha_toggle(
 
 
 @write_tool
-def ha_trigger_scene(
+def trigger_scene(
     entity_id: str,
     instance: str | None = None,
 ) -> str:
@@ -227,7 +227,7 @@ def ha_trigger_scene(
 
 
 @write_tool
-def ha_call_service(
+def call_service(
     domain: str,
     service: str,
     data: dict[str, Any] | None = None,
